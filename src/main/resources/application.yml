@@ -1,0 +1,35 @@
+server:
+  port: 8000
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+#      mvc:
+      routes:
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/v1/**
+            - Method=POST
+          filters:
+            - RemoveRequestHeader=Cookie  # 요청이 되어 있는 header값을 삭제.. → POST로 전달되는 데이터 값을 매번 새로운 데이터처럼 인식하기 위해서 request header값을 초기화
+            - RewritePath=/api/v1/user/(?<segment>.*), /$\{segment}
+
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/v1/**
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie  # 요청이 되어 있는 header값을 삭제.. → POST로 전달되는 데이터 값을 매번 새로운 데이터처럼 인식하기 위해서 request header값을 초기화
+            - RewritePath=/api/v1/user/(?<segment>.*), /$\{segment}
+            - AuthorizationHeaderFilter
+
