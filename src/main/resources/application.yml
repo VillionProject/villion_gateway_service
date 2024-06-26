@@ -37,8 +37,8 @@ spring:
           uri: lb://PRODUCT-SERVICE
           predicates:
             - Path=/api/v1/product/**
-            - Method=POST
+            - Method=POST, GET
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/api/v1/product/(?<segment>.*), /$\{segment}
-            - AuthorizationHeaderFilter
+#            - AuthorizationHeaderFilter
